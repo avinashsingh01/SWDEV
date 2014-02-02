@@ -1,0 +1,53 @@
+<Html>
+ <Head>
+ <Title>HTA Script</Title>
+ <Style>
+ 
+Body {Background-Color: CornSilk} 
+</Style>
+
+<HTA:Application 
+Caption = Yes 
+Border = Thick 
+ShowInTaskBar = No 
+MaximizeButton = Yes 
+MinimizeButton = Yes> 
+<script Language = VBScript> 
+Sub WindowsLoad 
+strHTML = "<table border='1' style='border-collapse: collapse' bordercolor='SaddleBrown' id='Table1' >" 
+strHTML = strHTML & "<tr>" 
+strHTML = strHTML & "<td width='10%' bgcolor = 'SeaShell'><font color = 'Blue'><b>ServerName</td>" 
+strHTML = strHTML & "<td width='10%' bgcolor = 'SeaShell'><font color = 'Blue'><b>Name</td>"
+strHTML = strHTML & "<td width='10%' bgcolor = 'SeaShell'><font color = 'Blue'><b>Display Name</td>" 
+strHTML = strHTML & "<td width='10%' bgcolor = 'SeaShell'><font color = 'Blue'><b>Start Mode</td>" 
+strHTML = strHTML & "<td width='10%' bgcolor = 'SeaShell'><font color = 'Blue'><b>State</td>" 
+strHTML = strHTML & "</tr>" 
+strComputer = MachineName.Value 
+arrServiceName = Array ("Bits","CcmExec","LanmanServer","MsiServer","RemoteRegistry","TermService","WinMgmt","WuauServ") 
+For Counter = i To UBound(arrServiceName) 
+Set objWMIService = GetObject("winmgmts:\\" & strComputer & "\root\Cimv2") 
+Set colItems = objWMIService.ExecQuery("Select * From Win32_Service where Name= '" & arrServiceName(Counter) & "'") 
+For Each objItem In colItems  
+strHTML = strHTML & "<tr>" 
+Window.Document.Title = "SMS Service Status For " & Ucase(strComputer) 
+strHTML = strHTML & "<td width='10%'>" & Strcomputer & "</td>" 
+strHTML = strHTML & "<td width='10%'>" & objItem.Name & "</td>" 
+strHTML = strHTML & "<td width='10%'>" & objItem.DisplayName  & "</td>" 
+strHTML = strHTML & "<td width='10%'>" & objItem.StartMode & "</td>" 
+If objItem.State = "Running" Then 
+strHTML = strHTML & "<td width='10%'><Font Color='Green'>" & objItem.State & "</Font></td>" 
+ElseIf objItem.State = "Stopped" Then 
+strHTML = strHTML & "<td width='10%'><Font Color='Red'>" & objItem.State & "</Font></td>" 
+End If 
+Next 
+Next 
+strHTML = strHTML & "</tr>" 
+strHTML = strHTML & "</table>" 
+DataArea.InnerHTML = strHTML 
+End Sub  
+</script><Body> 
+<p><h3 align = center><font color='Orange'>Daily Checks Services status</font></h3> 
+<div></div> 
+Enter Machine Name: <Input Type = "Text" Name = "MachineName"> 
+<Input Type = "Button" Value = "Run Script" Name = "Run_Button" onClick = "WindowsLoad"><P> 
+<Span Id = "DataArea"></Span></Body><Div Align = "Center">

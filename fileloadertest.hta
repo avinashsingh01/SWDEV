@@ -1,0 +1,107 @@
+<html> 
+<head> 
+<title>SAA-MTI RECON - presented By RBS PLC</title>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">  
+<META HTTP-EQUIV="MSThemeCompatible" CONTENT="Yes">  
+<HTA:APPLICATION 
+     ID="objSAAMTI" 
+     APPLICATIONNAME="SAAMTIRECON"
+     SCROLL="no"
+     SINGLEINSTANCE="yes"
+>
+	 
+<style>
+BODY
+{
+   background-color: buttonface;
+   font-family: Helvetica;
+   font-size: 10pt;
+   margin-top: 10px;
+   margin-left: 20px;
+   margin-right: 20px;
+   margin-bottom: 10px;
+}
+
+
+.button
+{
+   font-family: Helvetica;
+   font-size: 8pt;
+   width: 92px;
+
+}
+
+textarea
+{
+   font-family: arial;
+   font-size: 8pt;
+}
+
+select
+{
+   font-family: arial;
+   font-size: 8pt;
+   width: 350px;
+   margin-left: 0px;
+}
+
+td
+{
+   font-family: arial;
+   font-size: 10pt;
+}
+
+</style>
+<script language="vbscript">  
+
+Sub RunScript  
+  If fileloader1.value > " " Then
+     Input_span1.InnerHTML = fileloader1.value 
+  End if
+  If fileloader2.value > " " Then
+     Input_span2.InnerHTML = fileloader2.value 
+  End if
+ End Sub
+  
+ Sub Start_recon
+    Const ForReading = 1
+    Dim objFSO, inFile1, inFile2, strAnswer
+    strFile1 = ""
+	strFile2 = ""
+	
+    strFile1 = Input_span1.InnerHTML
+	strFile2 = Input_span2.InnerHTML
+	
+	Set objFSO = CreateObject("Scripting.FileSystemObject")
+    If objFSO.FileExists(strFile1) Then
+	   Set inFile1 = objFSO.OpenTextFile( strFile1, ForReading)
+	Else
+	  MsgBox "Could not find" & strFile1 & "."
+	  Exit Sub
+	End If
+	
+	If objFSO.FileExists(strFile2) Then
+	   Set inFile2 = objFSO.OpenTextFile( strFile2, ForReading)
+	Else
+	  MsgBox "Could not find " & strFile2 & "."
+	  Exit Sub
+	End If
+  End Sub  
+ 
+</script> 
+</head> 
+<body> 
+<p><h3 align = center><font color='Blue'>SAA-MTI RECON TOOL</font></h3> 
+<div></div>
+STEP 1 : Select SAA file:<br> 
+<input type="file" class="textarea" id="fileloader1" onchange="Runscript"</input>  
+<p>Path: <span id="Input_span1"></span><p>  
+<hr> 
+STEP 2: Select UPS file:<br> 
+<input type="file" id="fileloader2" onchange="Runscript"</input>  
+<p>Path: <span id="Input_span2"></span><p>
+<hr>
+STEP 3: Reconciliation <br>
+<p><input id=reconbutton  class="button" type="button" value="Start RECON" name="start_recon"  onClick="Start_recon"></p>
+</body> 
+</html>
