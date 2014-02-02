@@ -65,27 +65,73 @@ Sub RunScript
   
  Sub Start_recon
     Const ForReading = 1
-    Dim objFSO, inFile1, inFile2, strAnswer
+    Dim objFSO, strFile1, strFile2, outFile, inFilestream1, inFilestream2, outFilestream, strAnswer, strDate, Notfndcnt
     strFile1 = ""
 	strFile2 = ""
+	outFile = " "
 	
     strFile1 = Input_span1.InnerHTML
 	strFile2 = Input_span2.InnerHTML
+	strDate = Date()
+	strDate = Replace(strDate,"/","_")
+	outFile = "SAAMTI_RECON_REPORT_" & strDate & ".TXT"
 	
 	Set objFSO = CreateObject("Scripting.FileSystemObject")
     If objFSO.FileExists(strFile1) Then
-	   Set inFile1 = objFSO.OpenTextFile( strFile1, ForReading)
+	   Set inFilestream1 = objFSO.OpenTextFile( strFile1, ForReading)
 	Else
 	  MsgBox "Could not find" & strFile1 & "."
 	  Exit Sub
 	End If
 	
-	If objFSO.FileExists(strFile2) Then
-	   Set inFile2 = objFSO.OpenTextFile( strFile2, ForReading)
-	Else
-	  MsgBox "Could not find " & strFile2 & "."
-	  Exit Sub
+	If Not objFSO.FileExists(strFile2) Then
+		MsgBox "Could not find " & strFile2 & "."
+	    Exit Sub
 	End If
+	
+	Set outFilestream = objFSO.CreateTextFile(outFile, TRUE)
+	outFilestream.WriteLine "********************SAA MTI RECON REPORT*********************"
+	Notfndcnt = 0
+	
+	Do While Not inFilestream1.AtEndOfStream
+	    strLine1 =  inFilestream1.ReadLine
+		index1 = InStr(1,strLine1," ")
+		If index1 > 0 Then
+		   strLine1 = Mid(strLine1,1,(index1-1))
+		End if
+		Found = 0
+		
+		Set inFilestream2 = objFSO.OpenTextFile( strFile2, ForReading)
+		Do While Not inFilestream2.AtEndOfStream
+			strLine2 =  inFilestream2.ReadLine
+			index2 = InStr(1,strLine2," ")
+			If index2 > 0 Then
+				strLine2 = Mid(strLine2,1,(index1-1))
+			End if
+
+			If StrComp(strLine1,strLine2) = 0 Then
+			    Found = 1
+				Exit Do
+			End if	
+		Loop
+       	
+		inFilestream2.Close
+		If Found = 0 Then
+		   Notfndcnt = Notfndcnt + 1
+		   outFilestream.WriteLine "REC No:" & Notfndcnt & "--> " & strLine1
+		End if
+		
+	Loop
+	
+	If Notfndcnt = 0 Then
+		outFilestream.WriteLine "ALL RECORDS MATCHING, ZERO RECON ITEMS"
+	End If
+	outFilestream.WriteLine "**********************END OF REPORT*********************"
+	
+    inFilestream1.Close
+    outFilestream.Close
+    MsgBox "Processing complete! Please check RECON REPORT in folder"
+	
   End Sub  
  
 </script> 
